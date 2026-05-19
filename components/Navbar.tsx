@@ -7,6 +7,11 @@ export default function Navbar() {
 
   const { cart } = useCart();
 
+  const totalItems = cart.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+
   return (
     <nav className="bg-green-700 text-white shadow-md">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">

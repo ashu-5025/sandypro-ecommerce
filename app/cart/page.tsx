@@ -3,13 +3,19 @@
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
+import Link from "next/link";
 
 export default function CartPage() {
 
-  const { cart, removeFromCart } = useCart();
+  const {
+    cart,
+    removeFromCart,
+    increaseQuantity,
+    decreaseQuantity,
+  } = useCart();
 
   const totalPrice = cart.reduce(
-    (total, item) => total + item.price,
+    (total, item) => total + item.price * item.quantity,
     0
   );
 
@@ -57,10 +63,38 @@ export default function CartPage() {
                       {item.title}
                     </h2>
 
-                    <p className="text-green-700 text-2xl font-bold mt-3">
-                      ₹{item.price}
-                    </p>
+                    <div className="mt-4 flex items-center gap-4">
+                      <p className="text-green-700 text-2xl font-bold">
+                        ₹{item.price}
+                      </p>
 
+
+                      <div className="flex items-center gap-3">
+
+                        <button
+                          onClick={() =>
+                            decreaseQuantity(item.id)
+                          }                 
+                          className="bg-gray-200 hover:bg-gray-300 w-8 h-8 rounded-full"
+                        >
+                          -
+                        </button>
+
+                        <span className="text-xl font-semibold">
+                          {item.quantity}
+                        </span>
+
+                        <button
+                        onClick={() =>
+                          increaseQuantity(item.id)
+                          }
+                          className="bg-gray-200 hover:bg-gray-300 w-8 h-8 rounded-full"
+                          >
+                          +
+                        </button>
+
+                        </div>
+                      </div>
                   </div>
 
                   <button
@@ -91,9 +125,12 @@ export default function CartPage() {
                 </span>
               </div>
 
-              <button className="w-full bg-green-700 hover:bg-green-800 text-white py-4 rounded-2xl text-xl font-semibold">
-                Checkout
-              </button>
+              <Link href="/checkout">
+                <button className="w-full bg-green-700 hover:bg-green-800 text-white py-4 rounded-2xl text-xl font-semibold">
+                  Checkout
+                </button>
+
+              </Link>
 
             </div>
 
