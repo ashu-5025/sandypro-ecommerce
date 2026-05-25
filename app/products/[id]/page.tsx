@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { products } from "@/data/products";
+import { prisma } from "@/lib/prisma";
+import { notFound } from "next/navigation";
 
 export default async function ProductDetails({
   params,
@@ -9,18 +10,16 @@ export default async function ProductDetails({
 
   const { id } = await params;
 
-  const product = products.find(
-    (p) => p.id === id
-  );
+  const product = await prisma.product.findUnique({
+    where: {
+      id,
+    },
+  });
 
   if (!product) {
-    return (
-      <div className="p-20 text-3xl">
-        Product Not Found
-      </div>
-    );
+    notFound();
   }
-
+  
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-16 items-center">
