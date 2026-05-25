@@ -1,18 +1,71 @@
 "use client";
-
+import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import { useCart } from "@/context/CartContext";
 
 export default function CheckoutPage() {
 
   const { cart } = useCart();
+    const [customerName,
+      setCustomerName] =
+      useState("");
 
+    const [email,
+      setEmail] =
+      useState("");
+
+    const [phone,   
+      setPhone] =
+      useState("");
+
+    const [address,
+      setAddress] =
+      useState("");
   const totalPrice = cart.reduce(
     (total, item) =>
       total + item.price * item.quantity,
     0
   );
+  const handleCheckout =
+    async () => {
 
+      const response =
+        await fetch(
+          "/api/orders",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+
+              customerName,
+              email,
+              address,
+
+              totalAmount:
+                totalPrice,
+
+              items: cart,
+            }),
+          }
+        );
+
+      if (response.ok) {
+
+        alert(
+          "Order Placed Successfully!"
+        );
+
+      } else {
+
+        alert(
+          "Checkout Failed"
+        );
+      }
+  };
   return (
     <main className="min-h-screen bg-gray-50">
 
@@ -38,24 +91,51 @@ export default function CheckoutPage() {
               <input
                 type="text"
                 placeholder="Full Name"
+                value={customerName}
+                onChange={(e) =>
+                  setCustomerName(
+                  e.target.value
+                  )
+                }
+                  className="w-full border border-gray-300 rounded-2xl px-5 py-4 outline-none focus:border-green-700"
+                type="text"
+                placeholder="Full Name"
                 className="w-full border border-gray-300 rounded-2xl px-5 py-4 outline-none focus:border-green-700"
               />
 
               <input
                 type="email"
                 placeholder="Email Address"
-                className="w-full border border-gray-300 rounded-2xl px-5 py-4 outline-none focus:border-green-700"
+                value={email}
+                onChange={(e) =>
+                    setEmail(
+                        e.target.value
+                    )
+                }
+                className="w-full border border-gray-300 rounded-2xl px-5 py-4 outline-none focus:border-green-700"         
               />
 
               <input
                 type="text"
                 placeholder="Phone Number"
+                value={phone}
+                onChange={(e) =>
+                    setPhone(
+                      e.target.value
+                    )
+                }
                 className="w-full border border-gray-300 rounded-2xl px-5 py-4 outline-none focus:border-green-700"
               />
 
               <textarea
                 placeholder="Delivery Address"
                 rows={5}
+                value={address}
+                onChange={(e) =>
+                    setAddress(
+                      e.target.value
+                    )
+                }
                 className="w-full border border-gray-300 rounded-2xl px-5 py-4 outline-none focus:border-green-700"
               />
 
@@ -108,9 +188,7 @@ export default function CheckoutPage() {
             </div>
 
             <button
-              onClick={() =>
-                alert("Order Placed Successfully")
-              }
+              onClick={handleCheckout}
               className="w-full mt-10 bg-green-700 hover:bg-green-800 text-white py-4 rounded-2xl text-xl font-semibold shadow-lg"
             >
               Place Order
