@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import AdminNavbar from "@/components/AdminNavbar";
 
 export default function AdminPage() {
 
@@ -87,6 +88,7 @@ export default function AdminPage() {
 
   return (
     <main className="min-h-screen bg-gray-100 p-10">
+      <AdminNavbar />
 
       <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-lg p-10">
 

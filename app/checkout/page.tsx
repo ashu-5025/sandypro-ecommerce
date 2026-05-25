@@ -1,72 +1,174 @@
 "use client";
+
 import { useState } from "react";
+
 import Navbar from "@/components/Navbar";
+
 import { useCart } from "@/context/CartContext";
 
 export default function CheckoutPage() {
 
-  const { cart } = useCart();
-    const [customerName,
-      setCustomerName] =
-      useState("");
+  const {
+    cart,
+    clearCart,
+  } = useCart();
 
-    const [email,
-      setEmail] =
-      useState("");
+  const [
+    customerName,
+    setCustomerName,
+  ] = useState("");
 
-    const [phone,   
-      setPhone] =
-      useState("");
+  const [
+    email,
+    setEmail,
+  ] = useState("");
 
-    const [address,
-      setAddress] =
-      useState("");
+  const [
+    phone,
+    setPhone,
+  ] = useState("");
+
+  const [
+    address,
+    setAddress,
+  ] = useState("");
+
   const totalPrice = cart.reduce(
     (total, item) =>
-      total + item.price * item.quantity,
+      total +
+      item.price *
+        item.quantity,
     0
   );
+
   const handleCheckout =
     async () => {
 
+      if (
+        !customerName ||
+        !email ||
+        !phone ||
+        !address
+      ) {
+
+        alert(
+          "Please fill all details"
+        );
+
+        return;
+      }
+
       const response =
         await fetch(
-          "/api/orders",
+          "/api/payment",
           {
             method: "POST",
+
             headers: {
               "Content-Type":
                 "application/json",
             },
 
             body: JSON.stringify({
-
-              customerName,
-              email,
-              address,
-
-              totalAmount:
+              amount:
                 totalPrice,
-
-              items: cart,
             }),
           }
         );
 
-      if (response.ok) {
+      const order =
+        await response.json();
 
-        alert(
-          "Order Placed Successfully!"
-        );
+      const options = {
 
-      } else {
+        key:
+          process.env
+            .NEXT_PUBLIC_RAZORPAY_KEY_ID,
 
-        alert(
-          "Checkout Failed"
-        );
-      }
-  };
+        amount:
+          order.amount,
+
+        currency:
+          order.currency,
+
+        name:
+          "SANDYPRO Store",
+
+        description:
+          "Order Payment",
+
+        order_id:
+          order.id,
+
+        handler:
+          async function () {
+
+            const saveOrder =
+              await fetch(
+                "/api/orders",
+                {
+                  method: "POST",
+
+                  headers: {
+                    "Content-Type":
+                      "application/json",
+                  },
+
+                  body: JSON.stringify({
+
+                    customerName,
+
+                    email,
+
+                    phone,
+
+                    address,
+
+                    totalAmount:
+                      totalPrice,
+
+                    items:
+                      cart,
+                  }),
+                }
+              );
+
+            if (
+              saveOrder.ok
+            ) {
+
+              clearCart();
+
+              alert(
+                "Payment Successful & Order Placed!"
+              );
+
+              window.location.href =
+                "/";
+
+            } else {
+
+              alert(
+                "Order Saving Failed"
+              );
+            }
+          },
+
+        theme: {
+          color:
+            "#15803d",
+        },
+      };
+
+      const razorpay =
+        new (window as any)
+          .Razorpay(options);
+
+      razorpay.open();
+    };
+
   return (
+
     <main className="min-h-screen bg-gray-50">
 
       <Navbar />
@@ -94,12 +196,9 @@ export default function CheckoutPage() {
                 value={customerName}
                 onChange={(e) =>
                   setCustomerName(
-                  e.target.value
+                    e.target.value
                   )
                 }
-                  className="w-full border border-gray-300 rounded-2xl px-5 py-4 outline-none focus:border-green-700"
-                type="text"
-                placeholder="Full Name"
                 className="w-full border border-gray-300 rounded-2xl px-5 py-4 outline-none focus:border-green-700"
               />
 
@@ -108,11 +207,11 @@ export default function CheckoutPage() {
                 placeholder="Email Address"
                 value={email}
                 onChange={(e) =>
-                    setEmail(
-                        e.target.value
-                    )
+                  setEmail(
+                    e.target.value
+                  )
                 }
-                className="w-full border border-gray-300 rounded-2xl px-5 py-4 outline-none focus:border-green-700"         
+                className="w-full border border-gray-300 rounded-2xl px-5 py-4 outline-none focus:border-green-700"
               />
 
               <input
@@ -120,9 +219,9 @@ export default function CheckoutPage() {
                 placeholder="Phone Number"
                 value={phone}
                 onChange={(e) =>
-                    setPhone(
-                      e.target.value
-                    )
+                  setPhone(
+                    e.target.value
+                  )
                 }
                 className="w-full border border-gray-300 rounded-2xl px-5 py-4 outline-none focus:border-green-700"
               />
@@ -132,14 +231,15 @@ export default function CheckoutPage() {
                 rows={5}
                 value={address}
                 onChange={(e) =>
-                    setAddress(
-                      e.target.value
-                    )
+                  setAddress(
+                    e.target.value
+                  )
                 }
                 className="w-full border border-gray-300 rounded-2xl px-5 py-4 outline-none focus:border-green-700"
               />
 
             </div>
+
           </div>
 
           {/* Order Summary */}
@@ -159,6 +259,7 @@ export default function CheckoutPage() {
                 >
 
                   <div>
+
                     <h3 className="font-semibold text-lg">
                       {item.title}
                     </h3>
@@ -166,10 +267,13 @@ export default function CheckoutPage() {
                     <p className="text-gray-500">
                       Qty: {item.quantity}
                     </p>
+
                   </div>
 
                   <p className="font-bold text-green-700">
-                    ₹{item.price * item.quantity}
+                    ₹
+                    {item.price *
+                      item.quantity}
                   </p>
 
                 </div>
@@ -188,7 +292,9 @@ export default function CheckoutPage() {
             </div>
 
             <button
-              onClick={handleCheckout}
+              onClick={
+                handleCheckout
+              }
               className="w-full mt-10 bg-green-700 hover:bg-green-800 text-white py-4 rounded-2xl text-xl font-semibold shadow-lg"
             >
               Place Order

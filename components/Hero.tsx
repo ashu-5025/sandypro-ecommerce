@@ -1,4 +1,3 @@
-import Image from "next/image";
 
 export default function Hero() {
   return (
@@ -37,15 +36,28 @@ export default function Hero() {
 
         {/* Right Side */}
         <div className="relative flex justify-center">
-          <div className="absolute w-[500px] h-[500px] bg-green-200 rounded-full blur-3xl opacity-30"></div>
 
-          <Image
-            src="/products/floor-cleaner.jpg"
-            alt="SANDYPRO Products"
-            width={650}
-            height={650}
-            className="relative z-10 object-contain drop-shadow-2xl"
-          />
+          <div className="absolute w-[450px] h-[450px] bg-green-200 rounded-full blur-3xl opacity-30"></div>
+
+          <div className="relative z-10 w-[340px] h-[600px] rounded-[40px] overflow-hidden shadow-2xl">
+
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-full h-full object-contain"
+            >
+
+              <source
+                src="/videos/hero-video.mp4"
+                type="video/mp4"
+              />
+
+            </video>
+
+          </div>
+
         </div>
       </div>
     </section>
